@@ -1,11 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
-export default function AboutPage() {
+export default function AboutPage({ navigation, route }) {
   const aboutImage =
     "https://firebasestorage.googleapis.com/v0/b/sparta-image.appspot.com/o/lecture%2FaboutImage.png?alt=media&token=13e1c4f6-b802-4975-9773-e305fc7475c4";
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: "소개 페이지",
+      headerStyle: {
+        backgroundColor: "#00498c",
+        shadowColor: "#1F266A",
+      },
+      headerTintColor: "#fff",
+    });
+  }, []);
   return (
     <View style={styles.container}>
+      <StatusBar style="light" />
       <Text style={styles.title}>이것은 타이틀입니다 여러분!!</Text>
 
       <View style={styles.middle_container}>
