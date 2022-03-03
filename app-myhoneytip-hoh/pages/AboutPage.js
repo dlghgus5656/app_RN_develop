@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import * as Linking from "expo-linking";
 
 export default function AboutPage({ navigation, route }) {
   const aboutImage =
@@ -16,6 +17,10 @@ export default function AboutPage({ navigation, route }) {
       headerTintColor: "#fff",
     });
   }, []);
+
+  const blog_link = () => {
+    Linking.openURL("https://velog.io/@dlghgus5656");
+  };
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -25,8 +30,8 @@ export default function AboutPage({ navigation, route }) {
         <Image style={styles.middle_img} source={{ uri: aboutImage }} />
         <Text style={styles.mid_text1}>이것은 텍스트입니다 여러분!!</Text>
         <Text style={styles.mid_text2}>두번째 텍스트입니다 여러분!!</Text>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.button_text}>여러분의 인스타계정</Text>
+        <TouchableOpacity style={styles.button} onPress={() => blog_link()}>
+          <Text style={styles.button_text}>여러분의 블로그</Text>
         </TouchableOpacity>
       </View>
     </View>

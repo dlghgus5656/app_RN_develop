@@ -12,6 +12,8 @@ import data from "../data.json";
 import Card from "../components/Card";
 import Loading from "../components/Loading";
 import { StatusBar } from "expo-status-bar";
+import * as Location from "expo-location";
+import axios from "axios";
 
 export default function MainPage({ navigation, route }) {
   console.disableYellowBox = true;
@@ -21,6 +23,12 @@ export default function MainPage({ navigation, route }) {
   const [state, setState] = useState([]);
   //카테고리에 따라 다른 꿀팁을 그때그때 저장관리할 상태
   const [cateState, setCateState] = useState([]);
+
+  //날씨 데이터 상태관리 상태 생성!
+  const [weather, setWeather] = useState({
+    temp: 0,
+    condition: "",
+  });
 
   //컴포넌트에 상태를 여러개 만들어도 됨
   //관리할 상태이름과 함수는 자유자재로 정의할 수 있음
@@ -39,9 +47,42 @@ export default function MainPage({ navigation, route }) {
       let tip = data.tip;
       setState(tip);
       setCateState(tip);
+      getLocation();
       setReady(false);
     }, 1000);
   }, []);
+
+  const getLocation = async () => {
+    //수많은 로직중에 에러가 발생하면
+    //해당 에러를 포착하여 로직을 멈추고,에러를 해결하기 위한 catch 영역 로직이 실행
+    try {
+      //자바스크립트 함수의 실행순서를 고정하기 위해 쓰는 async,await
+      await Location.requestPermissionsAsync();
+      const locationData = await Location.getCurrentPositionAsync();
+      const latitude = locationData["coords"]["latitude"];
+      const longitude = locationData["coords"]["longitude"];
+      const API_KEY = "cfc258c75e1da2149c33daffd07a911d";
+      const result = await axios.get(
+        `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`
+      );
+
+      const temp = result.data.main.temp;
+      const condition = result.data.weather[0].main;
+
+      console.log(temp);
+      console.log(condition);
+
+      //오랜만에 복습해보는 객체 리터럴 방식으로 딕셔너리 구성하기!!
+      //잘 기억이 안난다면 1주차 강의 6-5를 다시 복습해보세요!
+      setWeather({
+        temp,
+        condition,
+      });
+    } catch (error) {
+      //혹시나 위치를 못가져올 경우를 대비해서, 안내를 준비합니다
+      Alert.alert("위치를 찾을 수가 없습니다.", "앱을 껏다 켜볼까요?");
+    }
+  };
 
   const category = (cate) => {
     if (cate == "전체보기") {
@@ -56,8 +97,9 @@ export default function MainPage({ navigation, route }) {
     }
   };
 
-  let todayWeather = 10 + 17;
-  let todayCondition = "흐림";
+  //실제 데이터를 넣을 예정이므로 주석!
+  // let todayWeather = 10 + 17;
+  // let todayCondition = "흐림"
 
   //처음 ready 상태값은 true 이므로 ? 물음표 바로 뒤에 값이 반환(그려짐)됨
   //useEffect로 인해 데이터가 준비되고, ready 값이 변경되면 : 콜론 뒤의 값이 반환(그려짐)
@@ -71,15 +113,15 @@ export default function MainPage({ navigation, route }) {
       <StatusBar style="black" />
       {/* <Text style={styles.title}>나만의 꿀팁</Text> */}
       <Text style={styles.weather}>
-        오늘의 날씨: {todayWeather + "°C " + todayCondition}{" "}
+        오늘의 날씨: {weather.temp + "°C   " + weather.condition}{" "}
       </Text>
       <TouchableOpacity
-        style={styles.about_btn}
+        style={styles.aboutButton}
         onPress={() => {
           navigation.navigate("AboutPage");
         }}
       >
-        <Text style={styles.about_text}>소개 페이지</Text>
+        <Text style={styles.aboutButtonText}>소개 페이지</Text>
       </TouchableOpacity>
       <Image style={styles.mainImage} source={main} />
       <ScrollView
@@ -157,25 +199,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     paddingRight: 20,
   },
-  about_btn: {
-    borderWidth: 1,
-    backgroundColor: "#f05650",
-    alignSelf: "flex-end",
-    marginRight: 22,
-    width: 100,
-    height: 40,
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 10,
-  },
-
-  about_text: {
-    color: "white",
-    textAlign: "center",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-
   mainImage: {
     //컨텐츠의 넓이 값
     width: "90%",
@@ -250,5 +273,19 @@ const styles = StyleSheet.create({
   cardContainer: {
     marginTop: 10,
     marginLeft: 10,
+  },
+  aboutButton: {
+    backgroundColor: "pink",
+    width: 100,
+    height: 40,
+    borderRadius: 10,
+    alignSelf: "flex-end",
+    marginRight: 20,
+    marginTop: 10,
+  },
+  aboutButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    marginTop: 10,
   },
 });
