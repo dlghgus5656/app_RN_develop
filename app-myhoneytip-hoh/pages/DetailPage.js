@@ -10,8 +10,12 @@ import {
   Share,
 } from "react-native";
 import * as Linking from "expo-linking";
+import { firebase_db } from "../firebaseConfig";
+import Constants from "expo-constants";
 
 export default function DetailPage({ navigation, route }) {
+  let user_idx = Constants.installationId;
+  console.log(user_idx);
   const [tip, setTip] = useState({
     idx: 9,
     category: "재테크",
@@ -32,11 +36,30 @@ export default function DetailPage({ navigation, route }) {
       },
       headerTintColor: "#fff",
     });
-    setTip(route.params);
+    //넘어온 데이터는 route.params에 들어 있습니다.
+    const { idx } = route.params;
+    firebase_db
+      .ref("/tip/" + idx)
+      .once("value")
+      .then((snapshot) => {
+        let tip = snapshot.val();
+        setTip(tip);
+      });
   }, []);
 
-  const popup = () => {
-    Alert.alert("팝업!!");
+  const like = () => {
+    // like 방 안에
+    // 특정 사용자 방안에
+    // 특정 찜 데이터 아이디 방안에
+    // 특정 찜 데이터 몽땅 저장!
+    // 찜 데이터 방 > 사용자 방 > 어떤 찜인지 아이디
+    const user_id = Constants.installationId;
+    firebase_db
+      .ref("/like/" + user_id + "/" + tip.idx)
+      .set(tip, function (error) {
+        console.log(error);
+        Alert.alert("찜 완료!");
+      });
   };
 
   const share = () => {
@@ -58,7 +81,7 @@ export default function DetailPage({ navigation, route }) {
         <Text style={styles.title}>{tip.title}</Text>
         <Text style={styles.desc}>{tip.desc}</Text>
         <View style={styles.buttonGroup}>
-          <TouchableOpacity style={styles.button} onPress={() => popup()}>
+          <TouchableOpacity style={styles.button} onPress={() => like()}>
             <Text style={styles.buttonText}>팁 찜하기</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => share()}>
