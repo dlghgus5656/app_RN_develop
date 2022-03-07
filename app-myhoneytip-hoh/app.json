@@ -13,20 +13,24 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
-    },
+    "assetBundlePatterns": ["**/*"],
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "buildNumber": "1.0.0",
+      "bundleIdentifier": "com.hoh.myhoneytip",
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-1472497959858965~8967805288"
+      }
+    },
+    "android": {
+      "package": "com.hoh.myhoneytip",
+      "versionCode": 1,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-1472497959858965~9925663731"
+      }
     }
   }
 }
